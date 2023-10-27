@@ -45,7 +45,10 @@ class _HomeViewState extends State<HomeView> {
             });
       })),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () => {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => const FormView()))
+        },
         child: const Icon(Icons.add),
       ),
     );
