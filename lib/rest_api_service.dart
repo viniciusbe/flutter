@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:hello_flutter/model.dart';
+import 'package:hello_flutter/home/home.model.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Movie>> fetchMovies() async {
