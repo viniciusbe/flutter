@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hello_flutter/shared/loading.viewmodel.dart';
 import 'package:hello_flutter/home/home.model.dart';
+import 'package:hello_flutter/shared/movie.model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class HomeViewModel extends LoadingViewModel {
+class HomeViewModel extends StatusViewModel {
   MovieListModel _homeModel = MovieListModel();
 
   HomeViewModel();
@@ -20,7 +21,7 @@ class HomeViewModel extends LoadingViewModel {
 
   Future<void> fetchData() async {
     try {
-      isLoading = true;
+      status = Status.loading;
       final response = await http.get(
           Uri.parse(
               'https://fqzyopllwufpsragzdju.supabase.co/rest/v1/movies?select=*'),
@@ -33,11 +34,12 @@ class HomeViewModel extends LoadingViewModel {
 
       List<dynamic> list = json.decode(response.body);
       _homeModel = MovieListModel.fromJson(list);
+      status = Status.success;
     } catch (exc) {
+      status = Status.error;
       debugPrint('Error in _fetchData : ${exc.toString()}');
     }
 
-    isLoading = false;
     notifyListeners();
   }
 }

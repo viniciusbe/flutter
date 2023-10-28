@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hello_flutter/form/form.viewmodel.dart';
+import 'package:hello_flutter/home/home.viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class FormView extends StatelessWidget {
   const FormView({super.key});
@@ -8,35 +11,47 @@ class FormView extends StatelessWidget {
   Widget build(BuildContext context) {
     const appTitle = 'Criar Filme';
 
-    return MaterialApp(
-      title: appTitle,
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text(appTitle),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(appTitle),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
-        body: const MyCustomForm(),
       ),
+      body: const MovieForm(),
     );
   }
 }
 
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key});
+class MovieForm extends StatefulWidget {
+  const MovieForm({super.key});
 
   @override
-  MyCustomFormState createState() {
-    return MyCustomFormState();
-  }
+  MovieFormState createState() => MovieFormState();
 }
 
-class MyCustomFormState extends State<MyCustomForm> {
+class MovieFormState extends State<MovieForm> {
   final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
   final _synopsisController = TextEditingController();
-  final _ageController = TextEditingController();
   final _durationController = TextEditingController();
+  final _ageController = TextEditingController();
+
+  late FormViewModel viewModel;
+
+  @override
+  void initState() {
+    viewModel = Provider.of<FormViewModel>(context, listen: false);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   viewModel.fetchData();
+    // });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,73 +60,91 @@ class MyCustomFormState extends State<MyCustomForm> {
       key: _formKey,
       child: Container(
           padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Nome', hintText: 'Openheimer'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                controller: _nameController,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Sinopse',
-                    hintText:
-                        'Oppenheimer é um filme histórico de drama dirigido por ...'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                controller: _synopsisController,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                    labelText: 'Duração (minutos)', hintText: '120'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                controller: _durationController,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Validate returns true if the form is valid, or false otherwise.
-                    if (_formKey.currentState!.validate()) {
-                      // If the form is valid, display a snackbar. In the real world,
-                      // you'd often call a server or save the information in a database.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text(
-                                'Processing Data ${_nameController.text} ${_synopsisController.text}')),
-                      );
-                    }
-                  },
-                  child: const Text('Criar'),
-                ),
-              ),
-            ],
+          child: Consumer<HomeViewModel>(
+            builder: (_, value, child) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Nome', hintText: 'Openheimer'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    },
+                    controller: _nameController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Sinopse',
+                        hintText:
+                            'Oppenheimer é um filme histórico de drama dirigido por ...'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    },
+                    controller: _synopsisController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Duração (minutos)', hintText: '120'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    },
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    controller: _durationController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: 'Classificação indicativa'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    },
+                    controller: _ageController,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Criando Filme')),
+                          );
+                          viewModel.createData(
+                              _nameController.text,
+                              _synopsisController.text,
+                              int.parse(_durationController.text),
+                              int.parse(_ageController.text));
+                        }
+                      },
+                      child: const Text('Salvar'),
+                    ),
+                  ),
+                ],
+              );
+            },
           )),
     );
   }

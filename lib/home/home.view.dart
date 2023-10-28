@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hello_flutter/form/form.view.dart';
-import 'package:hello_flutter/home/home.model.dart';
 import 'package:hello_flutter/home/home.viewmodel.dart';
+import 'package:hello_flutter/shared/movie.model.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatefulWidget {
@@ -32,18 +32,7 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(child: Consumer<HomeViewModel>(builder: (_, model, child) {
-        if (model.isLoading) {
-          return const CircularProgressIndicator();
-        }
-        List<Movie> list = model.homeModel.items;
-
-        return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (_, index) {
-              return ListTile(title: Text(list[index].name));
-            });
-      })),
+      body: const MovieList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
           Navigator.of(context)
@@ -52,5 +41,25 @@ class _HomeViewState extends State<HomeView> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+}
+
+class MovieList extends StatelessWidget {
+  const MovieList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Consumer<HomeViewModel>(builder: (_, model, child) {
+      if (model.isLoading()) {
+        return const CircularProgressIndicator();
+      }
+      List<Movie> list = model.homeModel.items;
+
+      return ListView.builder(
+          itemCount: list.length,
+          itemBuilder: (_, index) {
+            return ListTile(title: Text(list[index].name!));
+          });
+    }));
   }
 }

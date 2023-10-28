@@ -1,12 +1,18 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 
-class LoadingViewModel with ChangeNotifier {
-  bool _isLoading = false;
+enum Status { loading, success, error }
 
-  bool get isLoading => _isLoading;
+class StatusViewModel with ChangeNotifier {
+  Status _status = Status.loading;
 
-  set isLoading(bool isLoading) {
-    _isLoading = isLoading;
+  Status get status => _status;
+
+  set status(Status status) {
+    _status = status;
     notifyListeners();
   }
+
+  bool isLoading() => _status == Status.loading;
+  bool isSuccess() => _status == Status.success;
+  bool isError() => _status == Status.error;
 }

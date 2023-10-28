@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hello_flutter/form/form.viewmodel.dart';
 import 'package:hello_flutter/home/home.view.dart';
 import 'package:hello_flutter/home/home.viewmodel.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => HomeViewModel())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => HomeViewModel()),
+      ChangeNotifierProvider(create: (_) => FormViewModel())
+    ],
     child: const MyApp(),
   ));
 }
