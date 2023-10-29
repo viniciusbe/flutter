@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hello_flutter/form/form.viewmodel.dart';
-import 'package:hello_flutter/home/home.viewmodel.dart';
+import 'package:hello_flutter/shared/movie.model.dart';
 import 'package:provider/provider.dart';
 
 class FormView extends StatelessWidget {
@@ -46,11 +46,19 @@ class MovieFormState extends State<MovieForm> {
 
   @override
   void initState() {
-    viewModel = Provider.of<FormViewModel>(context, listen: false);
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   viewModel.fetchData();
-    // });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    int? movieId = ModalRoute.of(context)!.settings.arguments as int?;
+    viewModel = Provider.of<FormViewModel>(context, listen: false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.fetchData(movieId);
+    });
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -60,8 +68,28 @@ class MovieFormState extends State<MovieForm> {
       key: _formKey,
       child: Container(
           padding: const EdgeInsets.all(8),
-          child: Consumer<HomeViewModel>(
-            builder: (_, value, child) {
+          child: Consumer<FormViewModel>(
+            builder: (context, value, child) {
+              if (value.isLoading()) {
+                return const CircularProgressIndicator();
+              }
+              if (value.isCreated()) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Filme criado com sucesso!')),
+                  );
+                  Navigator.of(context).pop();
+                });
+              }
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Movie movie = value.formModel.movie;
+                _nameController.text = movie.name ?? '';
+                _synopsisController.text = movie.synopsis ?? '';
+                _durationController.text = (movie.duration ?? '').toString();
+                _ageController.text = (movie.age ?? '').toString();
+              });
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -96,6 +124,7 @@ class MovieFormState extends State<MovieForm> {
                     height: 10,
                   ),
                   TextFormField(
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                         labelText: 'Duração (minutos)', hintText: '120'),
                     validator: (value) {
@@ -111,6 +140,7 @@ class MovieFormState extends State<MovieForm> {
                     height: 10,
                   ),
                   TextFormField(
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                         labelText: 'Classificação indicativa'),
                     validator: (value) {
@@ -130,7 +160,7 @@ class MovieFormState extends State<MovieForm> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Criando Filme')),
+                            const SnackBar(content: Text('Criando Filme...')),
                           );
                           viewModel.createData(
                               _nameController.text,

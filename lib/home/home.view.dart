@@ -34,9 +34,12 @@ class _HomeViewState extends State<HomeView> {
       ),
       body: const MovieList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const FormView()))
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FormView(),
+                  settings: const RouteSettings(arguments: null)));
         },
         child: const Icon(Icons.add),
       ),
@@ -56,10 +59,20 @@ class MovieList extends StatelessWidget {
       List<Movie> list = model.homeModel.items;
 
       return ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (_, index) {
-            return ListTile(title: Text(list[index].name!));
-          });
+        itemCount: list.length,
+        itemBuilder: (_, index) {
+          return ListTile(
+            title: Text(list[index].name!),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const FormView(),
+                      settings: RouteSettings(arguments: list[index].id)));
+            },
+          );
+        },
+      );
     }));
   }
 }

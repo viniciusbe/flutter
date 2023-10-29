@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hello_flutter/shared/loading.viewmodel.dart';
+import 'package:hello_flutter/shared/status.viewmodel.dart';
 import 'package:hello_flutter/home/home.model.dart';
 import 'package:hello_flutter/shared/movie.model.dart';
 import 'dart:convert';
@@ -34,7 +34,7 @@ class HomeViewModel extends StatusViewModel {
 
       List<dynamic> list = json.decode(response.body);
       _homeModel = MovieListModel.fromJson(list);
-      status = Status.success;
+      status = Status.fetched;
     } catch (exc) {
       status = Status.error;
       debugPrint('Error in _fetchData : ${exc.toString()}');
